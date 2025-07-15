@@ -1,6 +1,6 @@
 # VPM Unity Package Workflow
 
-このリポジトリには、Unity Package Manager (VPM) 対応のUnityパッケージの自動リリース機能を提供するGitHubワークフローが含まれています。
+このリポジトリには、Unity Package Manager (VPM) 対応のUnityパッケージの自動リリース機能を提供するGitHubワークフローのテンプレートです。
 
 ## 📋 ワークフローの概要
 
