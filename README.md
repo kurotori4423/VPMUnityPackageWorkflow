@@ -2,6 +2,45 @@
 
 このリポジトリには、Unity Package Manager (VPM) 対応のUnityパッケージの自動リリース機能を提供するGitHubワークフローのテンプレートです。
 
+複数のパッケージを一つのVPMリポジトリで管理・自動更新するため以下のリポジトリをフォークしたものが必要です。
+[VPMRepositoryAutoUpdate](https://github.com/kurotori4423/VPMRepositoryAutoUpdate)
+
+## 機能
+
+### リリースドラフト自動生成機能
+
+
+## 使い方
+
+### 1. リポジトリの初期設定
+
+このリポジトリから `Use this template` ボタンでリポジトリを作成します。
+
+ワークフロー用の`Parsonal Access Token`が無い場合はGithubのユーザー設定から作成してください。
+`Parsonal Access Token`は`Select Scopes`で`workflow`にチェックを入れてください。
+
+作成したアクセストークンをリポジトリの`Settings` > `Secrets and variables` > `Actions` の `Repository secrets`に`VPM_REPO_TOKEN`として保存してください。
+
+`Settings` > `Actions` > `General` > `Workflow permissions` で `Read and write permissions`に設定してください。
+
+リポジトリをクローンして、`.github`フォルダをコピーします。
+
+`DispatchAddVRMRepository.yml`で34行目の`repository: your-username/repository name`を`VPMRepositoryAutoUpdate`リポジトリの物に変更します。
+
+### 2. VPMRepositoryAutoUpdateリポジトリ側での変更
+
+[VPMRepositoryAutoUpdateのREADME](https://github.com/kurotori4423/VPMRepositoryAutoUpdate/blob/main/README.md#2-%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86) を参考に、レポジトリの登録作業を行います。
+
+### リリースの作成
+
+[セマンティックバージョニング](https://semver.org/lang/ja/)(`v0.0.0`の形式)でバージョンをタグ付けして、プッシュします。
+
+すると、自動で`Update Package Version from Tag`ワークフローが実行され、`package.json`のバージョン表記がタグで指定したバージョンに書き換えられ、リリースドラフトが作成されます。
+
+リリースページで、リリースドラフトを確認し、パッチノートなどを描いたらリリースを公開します。
+
+公開後、自動的に`Dispatch-Add-VPM-Repository`ワークフローが実行され、VPMリポジトリにパッケージが登録されます。
+
 ## 📋 ワークフローの概要
 
 ### 1. 🏷️ UpdatePackageVersion.yml
@@ -47,37 +86,6 @@ git push origin v1.2.3
   - Repository Dispatchイベントを送信
 - **VPMリポジトリテンプレート**: [VPMRepositoryAutoUpdate](https://github.com/kurotori4423/VPMRepositoryAutoUpdate)
 
-## 🔧 セットアップ
-
-### 必要な設定
-
-1. **package.json**: プロジェクトルートに以下の形式で配置
-```json
-{
-  "displayName": "Your Package Name",
-  "version": "1.0.0",
-  "name": "com.yourname.packagename"
-}
-```
-
-2. **シークレット設定**:
-   - `VPM_REPO_TOKEN`: VPMリポジトリへの通知用トークン（DispatchAddVPMRepository.ymlで使用）
-
-3. **ワークフローの権限設定**
-   - Settings > Actions > General > Workflow permissions で `Read and write permissions` に設定してください。
-
-3. **プロジェクト構造**:
-   - `Assets/` フォルダにUnityアセットとmetaファイルを配置
-   - または、プロジェクトルートにmetaファイルを配置
-
-### VPMリポジトリ設定
-
-`DispatchAddVPMRepository.yml`で以下を適切に設定してください：
-- `repository`: あなたのVPMリポジトリ名
-- `client-payload`の`repository`: このパッケージのリポジトリ名
-
-VPMリポジトリの自動更新機能については、テンプレートリポジトリを参照してください：  
-📄 **[VPMRepositoryAutoUpdate](https://github.com/kurotori4423/VPMRepositoryAutoUpdate)** - VPMリポジトリの自動更新テンプレート
 
 ## 🔄 ワークフローの流れ
 

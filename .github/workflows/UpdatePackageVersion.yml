@@ -1,5 +1,8 @@
 name: Update Package Version from Tag
 
+# package.jsonのバージョンを、プッシュされたタグに基づいて更新します。
+# 完了後、Create Relase Draftを実行します。
+
 on:
   push:
     tags:
@@ -93,3 +96,10 @@ jobs:
           else
             echo "ℹ️ package.json version was already up to date (${{ steps.current_version.outputs.current_version }})"
           fi
+      
+      # package.jsonのバージョンが更新された場合、Create Unity Package Release Draftワークフローを実行
+      - name: Trigger Create Release Draft workflow
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: ./.github/workflows/CreateReleaseDraft.yml
+        with:
+          tag_name: ${{ steps.version.outputs.tag_name }}

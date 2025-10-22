@@ -1,4 +1,7 @@
 name: Dispatch-Add-VPM-Repository
+
+# VPMリポジトリ（いくつかのVPMパッケージをまとめて）に新しいバージョンを追加するワークフロー
+
 on:
     release:
       types: [published]
@@ -10,6 +13,7 @@ on:
           type: string
 
 jobs:
+  # VPMリポジトリのこのリポジトリの追加を依頼する
   SendVPMRepository:
     runs-on: ubuntu-latest
     steps:
@@ -27,6 +31,6 @@ jobs:
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.VPM_REPO_TOKEN }}
-          repository: your-username/repositoryname
+          repository: your-username/repositoryname # VPMリポジトリのオーナーとリポジトリ名に置き換えてください
           event-type: add_new_version
-          client-payload: '{"repository": "repositoryname", "tag": "${{ steps.vars.outputs.tag_name }}"}'
+          client-payload: '{"repository": "${{ github.event.repository.name }}", "tag": "${{ steps.vars.outputs.tag_name }}"}'

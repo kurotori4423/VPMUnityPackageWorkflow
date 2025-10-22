@@ -1,5 +1,9 @@
 name: Create Unity Package Release Draft
 
+# Unity Packageのリリースドラフトを作成するワークフロー
+# tag_name入力が提供された場合はそれを使用し、提供されなかった場合はpackage.jsonのバージョンからタグ名を生成します
+# リリースドラフトを作成したら、手動でリリースを行ってください。
+
 on:
   workflow_call:
     inputs:
