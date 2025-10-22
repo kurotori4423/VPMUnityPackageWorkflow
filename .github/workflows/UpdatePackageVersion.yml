@@ -13,12 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      # リポジトリをチェックアウト
+      # リポジトリをチェックアウト（mainブランチを明示的に指定）
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+          ref: main  # mainブランチを明示的にチェックアウト
       
       # タグからバージョン番号を抽出
       - name: Extract version from tag
@@ -84,9 +85,27 @@ jobs:
       - name: Commit and push changes
         if: steps.changes.outputs.has_changes == 'true'
         run: |
+          # 現在のブランチ状態を確認
+          echo "Current branch status:"
+          git status
+          git branch -a
+          
+          # mainブランチにいることを確認し、必要に応じて切り替え
+          CURRENT_BRANCH=$(git branch --show-current)
+          echo "Current branch: $CURRENT_BRANCH"
+          
+          if [ "$CURRENT_BRANCH" != "main" ]; then
+            echo "Not on main branch, switching to main..."
+            git checkout main
+            git pull origin main
+          fi
+          
+          # 変更をコミット
           git add package.json
           git commit -m "Update package.json version to ${{ steps.version.outputs.version }} (from tag ${{ steps.version.outputs.tag_name }})"
-          git push origin HEAD:main
+          
+          # プッシュ
+          git push origin main
       
       # 結果を表示
       - name: Display result
@@ -97,9 +116,41 @@ jobs:
             echo "ℹ️ package.json version was already up to date (${{ steps.current_version.outputs.current_version }})"
           fi
       
+      # コミットが確実に反映されるまで待機
+      - name: Wait for commit to be processed
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          echo "Waiting for commit to be processed..."
+          COMMIT_SHA=$(git rev-parse HEAD)
+          echo "Current commit SHA: $COMMIT_SHA"
+          
+          # GitHubのAPIを使ってコミットが反映されるまで待機
+          for i in {1..30}; do
+            echo "Checking commit status (attempt $i/30)..."
+            
+            # GitHub APIを使ってコミットの存在を確認
+            RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/${{ github.repository }}/commits/$COMMIT_SHA")
+            
+            # レスポンスにshaフィールドが含まれていればコミットが反映されている
+            if echo "$RESPONSE" | jq -e '.sha' > /dev/null 2>&1; then
+              echo "✅ Commit has been processed by GitHub API"
+              break
+            fi
+            
+            if [ $i -eq 30 ]; then
+              echo "⚠️ Timeout waiting for commit to be processed, continuing anyway..."
+            else
+              echo "Waiting 5 seconds before next check..."
+              sleep 5
+            fi
+          done
+      
       # package.jsonのバージョンが更新された場合、Create Unity Package Release Draftワークフローを実行
       - name: Trigger Create Release Draft workflow
         if: steps.changes.outputs.has_changes == 'true'
-        uses: ./.github/workflows/CreateReleaseDraft.yml
+        uses: benc-uk/workflow-dispatch@v1.2.2
         with:
-          tag_name: ${{ steps.version.outputs.tag_name }}
+          workflow: CreateReleaseDraft.yml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          inputs: '{"tag_name": "${{ steps.version.outputs.tag_name }}"}'
