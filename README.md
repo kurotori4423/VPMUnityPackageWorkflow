@@ -23,8 +23,6 @@
 
 `Settings` > `Actions` > `General` > `Workflow permissions` で `Read and write permissions`に設定してください。
 
-リポジトリをクローンして、`.github`フォルダをコピーします。
-
 `DispatchAddVRMRepository.yml`で34行目の`repository: your-username/repository name`を`VPMRepositoryAutoUpdate`リポジトリの物に変更します。
 
 ### 2. VPMRepositoryAutoUpdateリポジトリ側での変更
