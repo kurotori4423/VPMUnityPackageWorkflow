@@ -63,6 +63,9 @@ git push origin v1.2.3
 2. **シークレット設定**:
    - `VPM_REPO_TOKEN`: VPMリポジトリへの通知用トークン（DispatchAddVPMRepository.ymlで使用）
 
+3. **ワークフローの権限設定**
+   - Settings > Actions > General > Workflow permissions で `Read and write permissions` に設定してください。
+
 3. **プロジェクト構造**:
    - `Assets/` フォルダにUnityアセットとmetaファイルを配置
    - または、プロジェクトルートにmetaファイルを配置
@@ -128,3 +131,4 @@ git push origin v1.2.3
 - 除外するファイル・フォルダの調整
 - リリースノートの自動生成設定
 - 通知先の変更
+
