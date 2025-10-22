@@ -22,21 +22,11 @@ jobs:
             TAG_NAME="${{ github.event.release.tag_name }}"
           fi
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
-      
-      - name: Debug payload information
-        run: |
-          echo "=== Debug Information ==="
-          echo "Event name: ${{ github.event_name }}"
-          echo "Tag name: ${{ steps.vars.outputs.tag_name }}"
-          echo "Repository: AvatarPosingStationUtilities"
-          echo "Target repository: kurotori4423/vpm.kurotori4423"
-          echo "Client payload: {\"repository\": \"AvatarPosingStationUtilities\", \"tag\": \"${{ steps.vars.outputs.tag_name }}\"}"
-          echo "========================="
-      
+
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.VPM_REPO_TOKEN }}
           repository: your-username/repositoryname
           event-type: add_new_version
-          client-payload: '{"repository": "AvatarPosingStationUtilities", "tag": "${{ steps.vars.outputs.tag_name }}"}'
+          client-payload: '{"repository": "repositoryname", "tag": "${{ steps.vars.outputs.tag_name }}"}'
